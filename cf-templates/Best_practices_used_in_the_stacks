@@ -1,0 +1,20 @@
+Modularity: Each template focuses on a specific aspect of the infrastructure, such as networking, database provisioning, container orchestration, and application deployment. This modular approach makes it easier to manage and update individual components without affecting others.
+
+Parameterization: The templates use parameters extensively to make them customizable for different environments or use cases. Parameters allow users to provide input values at stack creation time, such as VPC name, instance types, subnet configurations, and database credentials.
+
+Mappings: Mappings are used to define logical mappings of keys to a corresponding set of named values. For instance, the RegionInstanceType mapping provides flexibility in defining instance types based on the AWS region, while the RegionAMI mapping maps region-specific AMI IDs.
+
+Resource Naming Conventions: Descriptive names are used for resources to enhance readability and maintainability. For example, resource names such as VPC, PublicSubnet1, ECSALB, and taskdefinition clearly indicate their purpose.
+
+Cross-Stack References: The use of cross-stack references enables sharing of resource outputs between stacks. Outputs from one stack, such as VPC IDs and subnet IDs, are exported and imported into other stacks where they are required.
+
+Resource Dependencies: Dependencies between resources are explicitly defined using the DependsOn attribute or by referencing other resources directly. This ensures that resources are created or updated in the correct order to satisfy dependencies.
+
+Deletion Policies: Deletion policies are set to Snapshot for resources like the RDS database instance. This ensures that data is backed up before resource deletion, providing a safety net against accidental data loss.
+
+Use of Intrinsic Functions: Templates leverage intrinsic functions such as !Ref, !Sub, !FindInMap, and !GetAtt to dynamically reference and retrieve resource attributes, import values, perform string substitutions, and access mappings.
+
+Secrets Management: Secrets such as database credentials are stored securely using AWS Secrets Manager. The template retrieves sensitive information stored in Secrets Manager and injects it into the relevant resources, ensuring secure handling of credentials.
+
+Health Monitoring: CloudWatch alarms are defined to monitor the health of the ECS cluster and ALB. For example, an alarm is triggered if the ALB generates too many HTTP 500 errors, enabling proactive monitoring and alerting.
+
