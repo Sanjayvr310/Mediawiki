@@ -77,26 +77,19 @@ aws cloudformation create-stack \
         ParameterKey=DBSubnetGroupName,ParameterValue=YourDBSubnetGroupName \
         ParameterKey=MediaWikiStackName,ParameterValue=YourMediaWikiStackName
 
-Make sure you have the AWS CLI configured properly with the iam user with the proper policy to deploy the above stacks or make sure the ec2 instace has the iam role with proper policy to deploy the resorces 
+If no role is available, CloudFormation uses a temporary session that is generated from your user credentials.
+Make sure you have the AWS CLI configured properly with the iam user with the proper policy to deploy the above stacks or make sure the ec2 instace has the iam role with proper policy to deploy the resorces.
 
-Note: These stack can be also be deployed using the cloudformation console 
+Note: These stack can be also be deployed using the cloudformation console .
 
 5)After testing and setting up the media wiki in local, understood that the LocalSettings.php(database connections,server deatils and other mediawiki page configs etc) has to be updated once the mediawiki is up and should be placed in the directory where we will be have the index.php othwewise just the blank page of mediawiki will be displayed and also noticed that the $wgServer has to be set with the base URL of the server, including protocol(https://www.mediawiki.org) ,since there is no DNS, in the ec2 we get as instance $wgServer = "http://<public_ip>:<port>" when LocalSettings.php is manually installed in the browser and when we do it in the ECS cluster set up ,running behind the ALB we get the ALB DNS when manually installed from the browser ,when in production world we cant set up in the browser and so have automated using a custom shell script(config.sh in the script folder).
 
-This bash script automates the setup and configuration of MediaWiki instances deployed on Amazon ECS-managed EC2 instances by installing and configuring the LocalSettings.php with running the php maintenance/install.php in the workdir of the mediawiki image. It iterates through each ECS container instance within a specified cluster, retrieves necessary details including EC2 instance IDs and public DNS names, and identifies MediaWiki Docker containers. It then updates the LocalSettings.php file and executes installation commands within each container, ensuring proper configuration and linkage to the specified database server with provided credentials(**the values are set in the mediawiki image already - this just runs it ensuring security**)
+This bash script automates the setup and configuration of MediaWiki instances deployed on Amazon ECS-managed EC2 instances by installing and configuring the LocalSettings.php with running the php maintenance/install.php in the workdir of the mediawiki image. It iterates through each ECS container instance within a specified cluster, retrieves necessary details including EC2 instance IDs and public DNS names, and identifies MediaWiki Docker containers. It then updates the LocalSettings.php file and executes installation commands within each container, ensuring proper configuration and linkage to the specified database server with provided credentials(**the values are set in the mediawiki image already - this just runs it ensuring security**).Refer **next_steps** for what could be done better.
 
-sh 
-
-
-Make sure you have the AWS CLI configured properly with the necessary permissions to create CloudFormation stacks
+Usage: sh <cluster_name> <db_name> <db_server> (could automate more)
 
 
-
-
-
-
-This stack has been tested and deployed in three aws regions and in the **output_images** folder can see the ouputs and the mediawiki up and running.Also kindly refer the **mission_mediawiki** file in the root dir for the steps followed to accomplish and also refer **next_steps**
-file for what can be done to this arch to improve the efficiency 
+This stack has been tested and deployed in three aws regions and in the **output_images** folder can see the ouputs and the mediawiki up and running.Also kindly refer the **mission_mediawiki** file in the root dir for the steps followed to accomplish and also refer **next_steps**  file for what can be done to this arch to improve the efficiency 
 
 
 
