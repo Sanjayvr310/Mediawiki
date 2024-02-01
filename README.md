@@ -5,7 +5,7 @@ Infrastructure Diagram
 
 Architecture overview:
 
-application architecture:
+Application architecture:
 The mediawiki image which will be pushed in to AWS ECS cluster widespread between two availability zone using public subnet (private VPC) as frontend part of service and separated from private subnet as backend part of service (db). In front of them is ALB (application HTTP/HTTPS load balancer) who forward outside requests to frontend containers in ECS cluster.The RDS stack implements Multi-AZ deployment, which automatically replicates the database across different Availability Zones ,with synchronous replication, data integrity is maintained across primary and standby instances, ensuring continuous availability and minimal downtime - this can be set(as a optional in cf template) and also with read replica as a optional for better performance.The architecture also implements several security measures to safeguard the database. Secrets Manager securely manages database credentials, ensuring that sensitive information remains encrypted and only accessible to authorized entities. Additionally, security groups define firewall rules to control inbound and outbound traffic, limiting access to the database and enhancing network security.
 
 Overview of the stacks:
