@@ -1,5 +1,5 @@
 # Use CentOS 7 as the base image
-# Have not used this in the cf-template but on how the mediawiki can be dockerized .Testing in local
+# Have not used this in the cf-template but on how the mediawiki can be dockerized .Tested in local and the mediawiki is up and running
 FROM centos:7
  
 # Installing dependencies
