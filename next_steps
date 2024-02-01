@@ -1,5 +1,5 @@
 With the current setup operational, the next steps could involve implementing RDS Proxy, setting up caching for RDS, and automating backups. Additionally, 
-the CI/CD pipeline is still in progress, with a sample CI/CD configuration uploaded in the cf_templates directory.It may be necessary to dockerize the MediaWiki image for deployment efficiency.
+the CI/CD pipeline is still in progress, with a sample CI/CD configuration uploaded in the cf_templates directory.
 
 Addressing the issue where the automation script for LocalSettings.php fails when a new instance scales up in the cluster requires finding solutions to automate this process reliably.
 
