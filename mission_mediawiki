@@ -1,0 +1,5 @@
+Once after receiving the assignment ,installed the mediawiki using the given steps in the documnetation and converted it to a shell script for automation and went
+throught how the mediawiki works and its configuration like the LocalSettings.php setup and made the mediawiki live in localhost. Setting up the LocalSettings.php via browser is a easy task but automating it via a shell script 
+in a production environment like ECS is a challenging work .After having a good look on how mediawiki works instead of the dockerizing the image went with the official image from docker hub
+and tested the connection between mediawiki and mariadb in a system where docker is configured and brought up the mediawiki up and running in docker environment .Next was it to move to a 
+production environment like ECS.Iac comes to play here and followed some of the best pratices of cloudformation to 
