@@ -89,7 +89,7 @@ This bash script automates the setup and configuration of MediaWiki instances de
 Usage: sh <cluster_name> <db_name> <db_server> (could automate more)
 
 
-This stack has been tested and deployed in three aws regions and in the **output_images** folder can see the ouputs and the mediawiki up and running.Also kindly refer the **mission_mediawiki** file in the root dir for the steps followed to accomplish and also refer **next_steps**  file for what can be done to this arch to improve the efficiency 
+This stack has been tested and deployed in three aws regions and in the **output_images** folder can see the ouputs and the mediawiki up and running.Also kindly refer the **steps_implemented** file in the root dir for the steps followed to accomplish and also refer **next_steps**  file for what can be done to this arch to improve the efficiency 
 
 
 
