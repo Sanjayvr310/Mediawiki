@@ -1,8 +1,8 @@
 After receiving the assignment, I first installed MediaWiki using the provided documentation and then proceeded to convert the installation steps into a shell script for automation.
 I delved into understanding how MediaWiki functions, including its configuration like setting up LocalSettings.php, and made the MediaWiki accessible on localhost. 
 While setting up LocalSettings.php via a browser is straightforward, automating it in a production environment like ECS presented challenges, although I implemented a solution, 
-I believe there might be simpler approaches. After gaining insights into MediaWiki's workings, I opted for the official image from Docker Hub instead of dockerizing the image myself 
-and tested the connection between MediaWiki and MariaDB in a Docker environment. Transitioning to a production environment like ECS, I leveraged Infrastructure as Code (IaC) principles 
+I believe there might be simpler approaches. After gaining insights into MediaWiki's workings, I opted for the official image from Docker Hub instead of using the mediawiki image I created
+myself in local via a Dockerfile and tested the connection between MediaWiki and MariaDB in a Docker environment. Transitioning to a production environment like ECS, I leveraged Infrastructure as Code (IaC) principles 
 and followed best practices in CloudFormation, ensuring secure and scalable infrastructure (refer to Best_practices_used_in_the_stacks under the templates dir). I ensured all settings 
 adhered to industry best practices. Additionally, I deployed the stack across three regions to address potential AMI issues, completing the task within approximately 3 days while 
 balancing job responsibilities, presenting another challenge in itself.
