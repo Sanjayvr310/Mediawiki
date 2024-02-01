@@ -62,10 +62,29 @@ aws cloudformation create-stack \
         ParameterKey=DesiredCapacity,ParameterValue=2 \
         ParameterKey=NetworkStackName,ParameterValue=YourNetworkStackName \
         ParameterKey=MaxSize,ParameterValue=3
- 
 
- 
- Make sure you have the AWS CLI configured properly with the necessary permissions to create CloudFormation stacks
+4)Create the rds.yaml with the options to enable multi-az and read-replica 
+aws cloudformation create-stack \
+    --stack-name YourStackName \
+    --template-body file://rds_template.yaml \
+    --parameters \
+        ParameterKey=DBName,ParameterValue=YourDBName \
+        ParameterKey=NetworkStackName,ParameterValue=YourNetworkStackName \
+        ParameterKey=DBAllocatedStorage,ParameterValue=YourDBAllocatedStorage \
+        ParameterKey=DBInstanceClass,ParameterValue=YourDBInstanceClass \
+        ParameterKey=MultiAZ,ParameterValue=false \
+        ParameterKey=EnableReadReplica,ParameterValue=true \
+        ParameterKey=DBSubnetGroupName,ParameterValue=YourDBSubnetGroupName \
+        ParameterKey=MediaWikiStackName,ParameterValue=YourMediaWikiStackName
+
+Make sure you have the AWS CLI configured properly with the iam user with the proper policy to deploy the above stacks or make sure the ec2 instace has the iam role with proper policy to deploy the resorces 
+
+Note: These stack can be also be deployed using the cloudformation console 
+
+5)After testing and setting up the media wiki in local, understood that the LocalSettings.php(database connections,server deatils and other mediawiki page configs etc) has to be updated once the mediawiki is up and should be placed in the directory where we will be have the index.php othwewise just the blank page of mediawiki will be displayed and also noticed that the $wgServer has to be set with the base URL of the server, including protocol(https://www.mediawiki.org) ,since there is no DNS, in the ec2 we get as instance $wgServer = "http://52.54.127.241:8033" when LocalSettings.php is manually installed in the browser and when we do it in the ECS cluster set up ,running behind the ALB we get the ALB DNS when manually installed from the browser ,when in production world we cant set up in the browser and so have automated using a custom shell script whihc
+
+
+Make sure you have the AWS CLI configured properly with the necessary permissions to create CloudFormation stacks
 
 
 
