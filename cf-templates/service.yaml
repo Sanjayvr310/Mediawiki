@@ -32,9 +32,9 @@ Mappings:
     us-east-1:
       AMI: ami-009fe1f06f9cae300
     us-east-2:
-      AMI: ami-009fe1f06f9cae300
+      AMI: ami-0dc6ab123db884c21
     us-west-1:
-      AMI: ami-009fe1f06f9cae300
+      AMI: ami-056d94282531ede29
 
 Resources:
   ECSCluster:
