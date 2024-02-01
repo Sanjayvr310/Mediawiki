@@ -1,0 +1,10 @@
+With the current setup operational, the next steps could involve implementing RDS Proxy, setting up caching for RDS, and automating backups. Additionally, 
+the CI/CD pipeline is still in progress, with a sample CI/CD configuration uploaded in the cf_templates directory.It may be necessary to dockerize the MediaWiki image for deployment efficiency.
+
+Addressing the issue where the automation script for LocalSettings.php fails when a new instance scales up in the cluster requires finding solutions to automate this process reliably.
+
+Expanding deployment to multiple regions can be achieved using StackSets, and further splitting the stack and utilizing cross-stack functionality can enhance deployment flexibility and management.
+
+On the networking front, implementing VPC peering and Transit Gateway can facilitate communication between resources across different VPCs. Introducing a network firewall in the public subnet can help control traffic flow through the Internet Gateway and enhance security.
+
+Configuring Route 53 before the ALB and ensuring traffic is HTTPS-compliant after acquiring a domain, obtaining a certificate, and attaching it to the ALB can enhance the overall security and reliability of the application infrastructure.
