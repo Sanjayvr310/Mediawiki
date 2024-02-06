@@ -9,26 +9,12 @@ phases:
     commands:
       # Log in to Docker Hub
       echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-      # Generate a unique tag for the Docker image
-      TAG="$(echo $CODEBUILD_BUILD_ID | cut -d':' -f2)"
-      export IMAGE_TAG="sanjayvrs/mediafinalred:$TAG"
-
   build:
     commands:
-     
-      # Build the Docker image with the dynamically generated tag
-      docker build -t "$IMAGE_TAG" .
-      # Tag the image with the latest tag
-      docker tag "$IMAGE_TAG" sanjayvrs/mediafinalred:latest
-
+      
+      # Build the Docker image
+      docker build -t sanjayvrs/mediafinalred:4 .
   post_build:
     commands:
       # Push the Docker image to Docker Hub
-      docker push "$IMAGE_TAG"
-      docker push sanjayvrs/mediafinalred:latest
-      # Create images.json file
-      printf '[{"name":"mediafinalred","imageUri":"sanjayvrs/mediafinalred"}]' > images.json
-
-artifacts:
-  files:
-    - images.json
+      docker push sanjayvrs/mediafinalred:4
