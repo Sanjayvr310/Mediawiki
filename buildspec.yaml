@@ -1,0 +1,19 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      docker: 18
+  pre_build:
+    commands:
+      # Log in to Docker Hub
+      echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  build:
+    commands:
+      # Build the Docker image
+      cd script
+      docker build -t sanjayvrs/mediafinalred:3 .
+  post_build:
+    commands:
+      # Push the Docker image to Docker Hub
+      docker push sanjayvrs/mediafinalred:3
