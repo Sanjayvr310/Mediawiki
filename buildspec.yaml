@@ -13,12 +13,13 @@ phases:
     commands:
       
       # Build the Docker image
-      docker build -t sanjayvrs/mediafinalred:4 .
+      docker build -t sanjayvrs/mediafinalred:5 .
   post_build:
     commands:
       # Push the Docker image to Docker Hub
       docker push sanjayvrs/mediafinalred:4
-      printf '[{"name":"mediafinalred","imageUri":"sanjayvrs/mediafinalred:4"}]' > images.json
+      
+      printf '[{"name":"mediafinalred","imageUri":"sanjayvrs/mediafinalred:5"}]' > images.json
 
 artifacts:
   files:
