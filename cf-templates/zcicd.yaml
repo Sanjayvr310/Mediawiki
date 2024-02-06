@@ -1,34 +1,33 @@
 AWSTemplateFormatVersion: 2010-09-09
-#To be implemeted 
+
+# This CloudFormation template - AWS LAMP infrastructure setup
+# template stack for continuous deployment using AWS pipeline..
+
+
 Parameters:
 
   GitHubRepo:
     Type: String
-    Description: The GitHub repository name.
 
   GitHubBranch:
     Type: String
-    Description: The branch of the GitHub repository to use.
 
   GitHubToken:
     Type: String
     NoEcho: true
-    Description: The GitHub personal access token for authentication.
 
   GitHubUser:
     Type: String
-    Description: The GitHub username.
 
   ClusterName:
     Type: String
-    Description: The name of the ECS cluster.
 
   ServiceName:
     Type: String
-    Description: The name of the ECS service.
+
 
 Resources:
-  ECRRepository:
+  Repository:
     Type: AWS::ECR::Repository
     Properties:
       RepositoryName: !Ref ServiceName
@@ -46,17 +45,33 @@ Resources:
               Service: codebuild.amazonaws.com
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: CodeBuildServicePolicy
+        - PolicyName: root
           PolicyDocument:
             Version: 2012-10-17
             Statement:
-              - Effect: Allow
+              - Resource: "*"
+                Effect: Allow
                 Action:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                   - ecr:GetAuthorizationToken
-                Resource: "*"
+              - Resource: !Sub arn:aws:s3:::${ArtifactBucket}/*
+                Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:GetObjectVersion
+              - Resource: !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${Repository}
+                Effect: Allow
+                Action:
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:BatchGetImage
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:PutImage
+                  - ecr:InitiateLayerUpload
+                  - ecr:UploadLayerPart
+                  - ecr:CompleteLayerUpload
 
   CodePipelineServiceRole:
     Type: AWS::IAM::Role
@@ -70,11 +85,20 @@ Resources:
               Service: codepipeline.amazonaws.com
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: CodePipelineServicePolicy
+        - PolicyName: root
           PolicyDocument:
             Version: 2012-10-17
             Statement:
-              - Effect: Allow
+              - Resource:
+                  - !Sub arn:aws:s3:::${ArtifactBucket}/*
+                Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                  - s3:GetBucketVersioning
+              - Resource: "*"
+                Effect: Allow
                 Action:
                   - ecs:DescribeServices
                   - ecs:DescribeTaskDefinition
@@ -85,7 +109,6 @@ Resources:
                   - codebuild:StartBuild
                   - codebuild:BatchGetBuilds
                   - iam:PassRole
-                Resource: "*"
 
   ArtifactBucket:
     Type: AWS::S3::Bucket
@@ -105,17 +128,18 @@ Resources:
           phases:
             pre_build:
               commands:
-                #istalling the docker if not there 
+                - $(aws ecr get-login --no-include-email)
+                - TAG="$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
+                - IMAGE_URI="${REPOSITORY_URI}:${TAG}"
             build:
               commands:
-                #building the docker file in the branch
-                #tag
+                - docker build --tag "$IMAGE_URI" .
             post_build:
               commands:
-                #pushing it to a ecr
-                #building the .json
+                - docker push "$IMAGE_URI"
+                - printf '[{"name":"mediawiki","imageUri":"%s"}]' "$IMAGE_URI" > images.json
           artifacts:
-            #.json file for details on the image 
+            files: images.json
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
         Image: aws/codebuild/docker:17.09.0
@@ -138,7 +162,7 @@ Resources:
       Stages:
         - Name: Source
           Actions:
-            - Name: GitHubSource
+            - Name: App
               ActionTypeId:
                 Category: Source
                 Owner: ThirdParty
@@ -150,11 +174,11 @@ Resources:
                 Branch: !Ref GitHubBranch
                 OAuthToken: !Ref GitHubToken
               OutputArtifacts:
-                - Name: SourceOutput
+                - Name: App
               RunOrder: 1
         - Name: Build
           Actions:
-            - Name: CodeBuild
+            - Name: Build
               ActionTypeId:
                 Category: Build
                 Owner: AWS
@@ -163,13 +187,13 @@ Resources:
               Configuration:
                 ProjectName: !Ref CodeBuildProject
               InputArtifacts:
-                - Name: SourceOutput
+                - Name: App
               OutputArtifacts:
                 - Name: BuildOutput
               RunOrder: 1
         - Name: Deploy
           Actions:
-            - Name: ECSDeploy
+            - Name: Deploy
               ActionTypeId:
                 Category: Deploy
                 Owner: AWS
@@ -186,4 +210,4 @@ Resources:
 
 Outputs:
   PipelineUrl:
-    Value: !Sub <>
+    Value: !Sub https://console.aws.amazon.com/codepipeline/home?region=${AWS::Region}#/view/${Pipeline}
