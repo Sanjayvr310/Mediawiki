@@ -17,9 +17,9 @@ phases:
   post_build:
     commands:
       # Push the Docker image to Docker Hub
-      docker push sanjayvrs/mediafinalred:4
+      docker push sanjayvrs/mediafinalred:5
       
-      printf '[{"name":"mediafinalred","imageUri":"sanjayvrs/mediafinalred:5"}]' > imagedefinitions.json
+      printf '[{"name":"service-ecs-demo-app","imageUri":"sanjayvrs/mediafinalred:5"}]' > imagedefinitions.json
 
 artifacts:
   files:
