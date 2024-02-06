@@ -15,7 +15,7 @@ RUN yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.no
 # Download and extract MediaWiki 1.41.0
 RUN rm -rf /var/www/html/* && \
     cd /var/www/html && \
-    wget https://releases.wikimedia.org/mediawiki/1.41/mediawiki-1.41.0.tar.gz && \
+    wget --no-check-certificate https://releases.wikimedia.org/mediawiki/1.41/mediawiki-1.41.0.tar.gz && \
     tar -zxvf mediawiki-1.41.0.tar.gz --strip-components=1 && \
     rm mediawiki-1.41.0.tar.gz
  
