@@ -19,8 +19,8 @@ phases:
       # Push the Docker image to Docker Hub
       docker push sanjayvrs/mediafinalred:4
       
-      printf '[{"name":"mediafinalred","imageUri":"sanjayvrs/mediafinalred:5"}]' > images.json
+      printf '[{"name":"mediafinalred","imageUri":"sanjayvrs/mediafinalred:5"}]' > imagedefinitions.json
 
 artifacts:
   files:
-    - images.json
+    - imagedefinitions.json
