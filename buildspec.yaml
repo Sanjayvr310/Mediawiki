@@ -19,7 +19,7 @@ phases:
       # Push the Docker image to Docker Hub
       docker push sanjayvrs/mediafinalred:5
       
-      printf '[{"name":"service-ecs-demo-app","imageUri":"sanjayvrs/mediafinalred:5"}]' > imagedefinitions.json
+      printf '[{"name":"mediawiki","imageUri":"sanjayvrs/mediafinalred:5"}]' > imagedefinitions.json
 
 artifacts:
   files:
