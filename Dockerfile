@@ -1,5 +1,5 @@
 # Use CentOS 7 as the base image
-# Have not used this in the cf-template but on how the mediawiki can be dockerized .Tested in local and the mediawiki is up and running
+#this is used in the cf and cicd
 FROM centos:7
 
 WORKDIR /var/www/html
