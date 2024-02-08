@@ -1,0 +1,115 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS CloudFormation Template RDS_Mariadb_With_Read_Replica:
+  This template provides a scalable and fault-tolerant architecture for deploying
+  MySQL databases on AWS RDS, with options for Multi-AZ deployment and read replicas
+   to enhance availability and performance.'
+Parameters:
+  DBName:
+    Default: ThoughtWorksRds
+    Description: The database name
+    Type: String
+    MinLength: '1'
+    MaxLength: '64'
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    ConstraintDescription: must begin with a letter and contain only alphanumeric
+      characters.
+  NetworkStackName:
+    Type: String
+    Description: The name of the networking stack that this stack will build upon.
+  DBAllocatedStorage:
+    Default: '5'
+    Description: The size of the database (Gb)
+    Type: Number
+    MinValue: '5'
+    MaxValue: '1024'
+    ConstraintDescription: must be between 5 and 1024Gb.
+  DBInstanceClass:
+    Description: The database instance type
+    Type: String
+    Default: db.t2.small
+    AllowedValues: [db.t1.micro, db.m1.small, db.m1.medium, db.m1.large, db.m1.xlarge,
+      db.m2.xlarge, db.m2.2xlarge, db.m2.4xlarge, db.m3.medium, db.m3.large, db.m3.xlarge,
+      db.m3.2xlarge, db.m4.large, db.m4.xlarge, db.m4.2xlarge, db.m4.4xlarge, db.m4.10xlarge,
+      db.r3.large, db.r3.xlarge, db.r3.2xlarge, db.r3.4xlarge, db.r3.8xlarge, db.m2.xlarge,
+      db.m2.2xlarge, db.m2.4xlarge, db.cr1.8xlarge, db.t2.micro, db.t2.small, db.t2.medium,
+      db.t2.large]
+    ConstraintDescription: must select a valid database instance type.
+  MultiAZ:
+    Description: Multi-AZ master database
+    Type: String
+    Default: 'false'
+    AllowedValues: ['true', 'false']
+    ConstraintDescription: must be true or false.
+  EnableReadReplica:
+    Description: Enable the ReadReplica
+    Type: String
+    Default: 'true'
+    AllowedValues: ['true', 'false']
+    ConstraintDescription: must be true or false.
+  DBSubnetGroupName:
+    Type: String
+    Description: The name of the RDS DB subnet group.
+  MediaWikiStackName:
+    Type: String
+    Description: The name of the media-wiki stack that this stack will build upon.
+Conditions:
+  Enable-Read-Replica: !Equals [ !Ref EnableReadReplica, 'true' ]
+Resources:
+  DBEC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Open database for access
+      VpcId: {'Fn::ImportValue': !Sub '${NetworkStackName}:VPCId'}
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '3306'
+        ToPort: '3306'
+        SourceSecurityGroupId: {'Fn::ImportValue': !Sub '${MediaWikiStackName}:EcsSecurityGroupId'}
+
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet group for the RDS instance
+      DBSubnetGroupName: !Ref DBSubnetGroupName
+      SubnetIds:
+        - !ImportValue
+          Fn::Join: [ ':', [ !Ref 'NetworkStackName', 'PrivateSubnetTwo' ] ]
+        - !ImportValue
+          Fn::Join: [ ':', [ !Ref 'NetworkStackName', 'PrivateSubnetOne' ] ]
+
+  MasterDB:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBName: !Ref 'DBName'
+      AllocatedStorage: !Ref 'DBAllocatedStorage'
+      DBInstanceClass: !Ref 'DBInstanceClass'
+      Engine: MariaDB
+      MasterUsername: '{{resolve:secretsmanager:RDScreds:SecretString:username}}'
+      MasterUserPassword: '{{resolve:secretsmanager:RDScreds:SecretString:password}}'
+      DBSubnetGroupName: !Ref 'DBSubnetGroup'
+      EngineVersion: 10.6.14
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: { Ref: 'AWS::Region' }
+      MultiAZ: !Ref 'MultiAZ'
+      Tags:
+      - Key: Name
+        Value: Master Database
+      VPCSecurityGroups:
+       - !GetAtt DBEC2SecurityGroup.GroupId
+    DeletionPolicy: Snapshot
+  ReplicaDB:
+    Type: AWS::RDS::DBInstance
+    Condition: Enable-Read-Replica
+    Properties:
+      SourceDBInstanceIdentifier: !Ref 'MasterDB'
+      DBInstanceClass: !Ref 'DBInstanceClass'
+      Tags:
+      - Key: Name
+        Value: Read Replica Database
+
+Outputs:
+  RDSEndpointAddress:
+    Description: RDS endpoint address
+    Value: !GetAtt MasterDB.Endpoint.Address
